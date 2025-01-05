@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Farmetta", "Farmetta\Farmetta\Farmetta.csproj", "{147C3854-AF5A-434F-84BD-BB6BA19275E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Farmetta.Client", "Farmetta\Farmetta.Client\Farmetta.Client.csproj", "{D6CA2057-1295-4772-9B52-1448C0599DCF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationManager", "NotificationManager\NotificationManager.csproj", "{5B75F15D-6338-4F9B-9497-E0C86B7B0D2F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{147C3854-AF5A-434F-84BD-BB6BA19275E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{147C3854-AF5A-434F-84BD-BB6BA19275E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{147C3854-AF5A-434F-84BD-BB6BA19275E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{147C3854-AF5A-434F-84BD-BB6BA19275E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6CA2057-1295-4772-9B52-1448C0599DCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6CA2057-1295-4772-9B52-1448C0599DCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6CA2057-1295-4772-9B52-1448C0599DCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6CA2057-1295-4772-9B52-1448C0599DCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B75F15D-6338-4F9B-9497-E0C86B7B0D2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B75F15D-6338-4F9B-9497-E0C86B7B0D2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B75F15D-6338-4F9B-9497-E0C86B7B0D2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B75F15D-6338-4F9B-9497-E0C86B7B0D2F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
