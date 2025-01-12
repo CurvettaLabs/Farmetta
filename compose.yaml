@@ -1,0 +1,28 @@
+﻿services:
+  farmetta:
+    image: farmetta
+    build:
+      context: .
+      dockerfile: Farmetta/Farmetta/Dockerfile
+    networks:
+      - farmetta_network
+    ports:
+      - "8080:8080"
+      - "57000:57000"
+      - "57200:57200"
+      - "57400:57400"
+
+  virtual-printer:
+    image: virtual-klipper-printer-printer
+    build:
+      context: C:\Users\unada\virtual-klipper-printer
+      dockerfile: Dockerfile
+    networks:
+      - farmetta_network
+    ports:
+      - "7125:7125"
+      - "8110:8080" 
+    
+networks:
+  farmetta_network:
+    driver: bridge

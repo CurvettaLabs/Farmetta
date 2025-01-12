@@ -1,7 +1,39 @@
 ﻿@page "/"
+@using NotificationManager
+@inject NotificationSender NotificationSender
+@inject IJSRuntime JS
+
+@rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
+
+<button @onclick="RequestNotificationPermission">Request Notification Permission</button>
+<button @onclick="TestPushNotification">Push</button><br/>
+@message
+
+@code
+{
+    string message = "";
+    async Task RequestNotificationPermission()
+    {
+        await NotificationSender.RequestNotificationPermission(1);
+        message = "Requested";
+    }
+
+    async Task TestPushNotification()
+    {
+        await NotificationSender.SendNotificationAll("{\"title\": \"Farmetta: Your Print is Done!\", \"data\": \"My Data\"}");
+        WaitForNotification();
+    }
+
+    async void WaitForNotification()
+    {
+        await Task.Delay(30000);
+        
+        await NotificationSender.SendNotificationAll("{\"title\": \"Farmetta: Your Print is Done!\", \"data\": \"My Data\"}");
+    }
+}
