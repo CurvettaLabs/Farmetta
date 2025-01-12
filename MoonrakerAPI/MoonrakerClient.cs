@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Text;
+using System.Text.Json;
+using MoonrakerAPI.API;
 
 namespace MoonrakerAPI;
 
@@ -49,17 +51,18 @@ public partial class MoonrakerClient
                 if (!result.EndOfMessage)
                     continue;
 
-                try
-                {
-                    MessageReceived.Invoke(this, stringBuffer);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                var jsonRpc = JsonSerializer.Deserialize<JsonRpc>(stringBuffer);
+                if(jsonRpc == null)
+                    throw new Exception("Unable to parse json rpc");
 
+                // StringBuffer is no longer needed
                 stringBuffer = string.Empty;
-
+                
+                // Attempt full parse
+                if (TryReceiveWebsocketNotification(jsonRpc))
+                {
+                    Console.WriteLine("Received websocket notification");
+                }
             }
         }
     }
