@@ -16,7 +16,7 @@ public class ProcessStatisticUpdate :
         Method = baseJsonRpc.Method;
         
         if(Method != MethodName)
-            throw new ArgumentException("Method must be \"notify_proc_stat_update\"");
+            throw new ArgumentException($"Method must be \"{MethodName}\"");
 
         /*if(RawParams == null)
             throw new ArgumentException("RawParams must not be null");
