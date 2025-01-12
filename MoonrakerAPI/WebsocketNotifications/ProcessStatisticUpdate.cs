@@ -8,12 +8,14 @@ namespace MoonrakerAPI.WebsocketNotifications;
 public class ProcessStatisticUpdate :
     JsonRpc
 {
+    public const string MethodName = "notify_proc_stat_update";
+    
     public ProcessStatisticUpdate(JsonRpc baseJsonRpc)
     {
         JsonRpcVersion = baseJsonRpc.JsonRpcVersion;
         Method = baseJsonRpc.Method;
         
-        if(Method != "notify_proc_stat_update")
+        if(Method != MethodName)
             throw new ArgumentException("Method must be \"notify_proc_stat_update\"");
 
         /*if(RawParams == null)
