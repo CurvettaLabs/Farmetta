@@ -6,7 +6,7 @@ using MoonrakerAPI.API;
 
 namespace MoonrakerAPI;
 
-public partial class MoonrakerClient
+public partial class MoonrakerClient : IDisposable
 {
     private readonly ClientWebSocket _webSocket;
     private readonly CancellationTokenSource _cts = new();
@@ -24,9 +24,20 @@ public partial class MoonrakerClient
 
     public async Task Connect()
     {
-        await _webSocket.ConnectAsync(_uri, CancellationToken.None);
+        await _webSocket.ConnectAsync(_uri, _cts.Token);
         Thread receiveLoop = new(StartReceiveLoop);
         receiveLoop.Start();
+    }
+
+    public async Task Disconnect()
+    {
+        await _cts.CancelAsync();
+        await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "NormalClosure", CancellationToken.None);
+    }
+    
+    public void Dispose()
+    {
+        _webSocket.Dispose();
     }
 
     private async Task<string> AwaitStringMessage()
@@ -66,4 +77,6 @@ public partial class MoonrakerClient
             }
         }
     }
+    
+    
 }

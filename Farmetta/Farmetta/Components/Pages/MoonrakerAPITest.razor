@@ -1,9 +1,31 @@
 ﻿@page "/MoonrakerAPITest"
 @rendermode InteractiveServer
 
+@inject MoonrakerInstanceManager MoonrakerInstanceManager
+
 <h3>MoonrakerAPITest</h3>
 
 <button @onclick="Connect">Connect</button><br/>
 <h3>Status: @_status</h3>
 <br/>
-<p style="border: 1px solid; padding: 5px">@messages</p>
+<p style="border: 1px solid; padding: 5px">
+    @if (_processStatistics != null)
+    {
+        <div>
+            Websocket Connections: @_processStatistics.Params[0].WebsocketConnections <br/>
+            CPU Temp: @_processStatistics.Params[0].CpuTemp <br/>
+            MoonrakerStats{ <br/>
+            Memory: @_processStatistics.Params[0].MoonrakerStats.Memory @_processStatistics.Params[0].MoonrakerStats.MemUnits,<br/>
+            Time: @_processStatistics.Params[0].MoonrakerStats.Time,<br/>
+            CpuUsage: @_processStatistics.Params[0].MoonrakerStats.CpuUsage,<br/>
+            }<br/>
+        </div>
+    }
+</p>
+
+<div>
+    Moonraker Instance Name: <input @bind="moonrakerInstanceName"/><br/>
+    Moonraker Instance Ip: <input @bind="moonrakerIp"/><br/>
+    Moonraker Instance Port: <input @bind="moonrakerPort"/><br/>
+    <button @onclick="AddMoonrakerInstance">Add Instance</button>
+</div>

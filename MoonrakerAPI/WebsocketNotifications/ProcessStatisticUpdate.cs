@@ -65,7 +65,7 @@ public class ProcessStatisticUpdateParams
     public MoonrakerStats MoonrakerStats { get; set; }
     
     [JsonPropertyName("cpu_temp")]
-    public double CpuTemp { get; set; }
+    public double? CpuTemp { get; set; }
     
     [JsonPropertyName("network")]
     public Dictionary<string, NetworkStats> Network { get; set; } // Changed to Dictionary
