@@ -75,7 +75,7 @@ public class MoonrakerInstanceManager
         }
     }
 
-    public List<string> GetAllMoonrakerInstanceNames()
+    public IReadOnlyList<string> GetAllMoonrakerInstanceNames()
     {
         lock (_moonrakerClientsDictionary)
         {

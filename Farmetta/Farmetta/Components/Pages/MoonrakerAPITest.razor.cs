@@ -14,6 +14,9 @@ public partial class MoonrakerAPITest : ComponentBase
     private ProcessStatisticUpdate? _processStatistics;
     
     private MoonrakerClient? _moonrakerClient;
+    
+    [Inject]
+    private MoonrakerInstanceManager MoonrakerInstanceManager { get; set; } = null!;
 
     private async Task AddMoonrakerInstance()
     {

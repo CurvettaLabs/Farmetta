@@ -1,8 +1,6 @@
 ﻿@page "/MoonrakerAPITest"
 @rendermode InteractiveServer
 
-@inject MoonrakerInstanceManager MoonrakerInstanceManager
-
 <h3>MoonrakerAPITest</h3>
 
 <button @onclick="Connect">Connect</button><br/>
@@ -29,3 +27,16 @@
     Moonraker Instance Port: <input @bind="moonrakerPort"/><br/>
     <button @onclick="AddMoonrakerInstance">Add Instance</button>
 </div>
+
+<h3>Moonraker Instances:</h3>
+<table>
+    <tr>
+        <td>Instance Name</td>
+    </tr>
+    @foreach (var moonInstanceName in MoonrakerInstanceManager.GetAllMoonrakerInstanceNames())
+    {
+        <tr>
+            <td>@moonInstanceName</td>
+        </tr>
+    }
+</table>
