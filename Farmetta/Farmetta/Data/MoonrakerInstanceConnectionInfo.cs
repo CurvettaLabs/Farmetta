@@ -9,4 +9,6 @@ public class MoonrakerInstanceConnectionInfo
     public required string Name { get; set; }
     public required Uri Uri { get; set; }
     
+    public required bool ShouldReconnect { get; set; }
+    
 }

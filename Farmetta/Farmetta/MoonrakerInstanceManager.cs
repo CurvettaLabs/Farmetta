@@ -3,14 +3,21 @@ using MoonrakerAPI;
 
 namespace Farmetta;
 
-public class MoonrakerInstanceManager
+public class MoonrakerInstanceManager : IDisposable
 {
     private readonly IServiceScopeFactory _scopeFactory;
-    private readonly Dictionary<int, MoonrakerClient> _moonrakerClients; // Lock on _moonrakerClients
-    private readonly Dictionary<string, MoonrakerClient> _moonrakerClientsDictionary; // Lock on _moonrakerClientsDictionary
-    
     
     private int _reconnectAttemptRateSeconds;// Lock on this
+    private Dictionary<int, MoonrakerClient> _moonrakerClients;
+
+    public delegate void MoonrakerEvent(string clientName, MoonrakerClient moonrakerClient);
+    
+    public event MoonrakerEvent? OnMoonrakerClientConnected;
+    
+    public event MoonrakerEvent? OnMoonrakerClientDisconnected;
+    
+    public event MoonrakerEvent? OnMoonrakerClientCreated;
+    public event MoonrakerEvent? OnMoonrakerClientRemoved;
 
     public int ReconnectAttemptRateSeconds 
     {
@@ -35,22 +42,24 @@ public class MoonrakerInstanceManager
     {
         _scopeFactory = scopeFactory;
         _moonrakerClients = new Dictionary<int, MoonrakerClient>();
-        _moonrakerClientsDictionary = new Dictionary<string, MoonrakerClient>();
 
-        using var db = GetDbContext();
+        using var scope = GetServiceScope();
+        using var db = GetDbContext(scope);
 
         foreach (var moonrakerClient in db.MoonrakerInstances)
         {
             int moonrakerClientId = moonrakerClient.Id;
-            string moonrakerClientName = moonrakerClient.Name;
             Uri moonrakerUri = moonrakerClient.Uri;
+            bool shouldKeepConnectionOpen = moonrakerClient.ShouldReconnect;
             
             MoonrakerClient moonrakerClientInstance = new(moonrakerUri);
             _moonrakerClients.Add(moonrakerClientId, moonrakerClientInstance);
-            _moonrakerClientsDictionary.Add(moonrakerClientName, moonrakerClientInstance);
+
+            moonrakerClientInstance.OnDisconnect += OnClientDisconnect;
+
+            if (shouldKeepConnectionOpen)
+                _ = moonrakerClientInstance.Connect();
         }
-        
-        // TODO: Start Thread to reconnect
     }
 
     public MoonrakerClient this[int instanceId]
@@ -64,30 +73,42 @@ public class MoonrakerInstanceManager
         }
     }
 
-    public MoonrakerClient this[string instanceName]
+    public void Dispose()
+    {
+        foreach (var moonrakerClient in _moonrakerClients)
+            moonrakerClient.Value.Dispose();
+    }
+
+    public MoonrakerClient? this[string instanceName]
     {
         get
         {
-            lock (_moonrakerClientsDictionary)
+            using var scope = GetServiceScope();
+            using var db = GetDbContext(scope);
+
+            var instanceConnectionInfo = db.MoonrakerInstances.FirstOrDefault(instance => instance.Name == instanceName);
+            if (instanceConnectionInfo == null)
+                return null;
+            
+            lock (_moonrakerClients)
             {
-                return _moonrakerClientsDictionary[instanceName];
+                return _moonrakerClients[instanceConnectionInfo.Id];
             }
         }
     }
 
     public IReadOnlyList<string> GetAllMoonrakerInstanceNames()
     {
-        lock (_moonrakerClientsDictionary)
-        {
-            return _moonrakerClientsDictionary.Keys.ToList();
-        }
+        using var scope = GetServiceScope();
+        using var db = GetDbContext(scope);
+        return db.MoonrakerInstances.Select(instance => instance.Name).ToList();
     }
 
-    public List<MoonrakerClient> GetAllMoonrakerClients()
+    public IReadOnlyList<MoonrakerClient> GetAllMoonrakerClients()
     {
-        lock (_moonrakerClientsDictionary)
+        lock (_moonrakerClients)
         {
-            return _moonrakerClientsDictionary.Values.ToList();
+            return _moonrakerClients.Values.ToList();
         }
     }
 
@@ -101,10 +122,12 @@ public class MoonrakerInstanceManager
         {
             Id = 0,
             Name = moonrakerInstanceName,
-            Uri = moonrakerInstanceUri
+            Uri = moonrakerInstanceUri,
+            ShouldReconnect = true
         };
 
-        await using var db = GetDbContext();
+        using var scope = GetServiceScope();
+        await using var db = GetDbContext(scope);
         db.MoonrakerInstances.Add(connectionInfo);
         await db.SaveChangesAsync();
 
@@ -114,28 +137,80 @@ public class MoonrakerInstanceManager
         {
             _moonrakerClients.Add(connectionInfo.Id, moonrakerClient);
         }
+        
+        moonrakerClient.OnDisconnect += OnClientDisconnect;
 
-        lock (_moonrakerClientsDictionary)
-        {
-            _moonrakerClientsDictionary.Add(moonrakerInstanceName, moonrakerClient);
-        }
+        await moonrakerClient.Connect();
+        
+        OnMoonrakerClientCreated?.Invoke(moonrakerInstanceName, moonrakerClient);
 
         return moonrakerClient;
     }
 
-    private ApplicationDbContext GetDbContext()
+    public async Task RemoveClient(string moonrakerInstanceName)
     {
-        var scope = _scopeFactory.CreateScope();
+        using var scope = GetServiceScope();
+        await using var db = GetDbContext(scope);
+        
+        var connectionInfo = db.MoonrakerInstances.FirstOrDefault(instance => instance.Name == moonrakerInstanceName);
+        if(connectionInfo == null)
+            return;
+
+        db.MoonrakerInstances.Remove(connectionInfo);
+        await db.SaveChangesAsync();
+        
+        MoonrakerClient moonrakerClient = this[connectionInfo.Id];
+        await moonrakerClient.Disconnect();
+        
+        lock (_moonrakerClients)
+        {
+            _moonrakerClients.Remove(connectionInfo.Id);
+        }
+        
+        OnMoonrakerClientRemoved?.Invoke(moonrakerInstanceName, moonrakerClient);
+
+    }
+
+    private IServiceScope GetServiceScope()
+    {
+        return _scopeFactory.CreateScope();
+    }
+
+    private ApplicationDbContext GetDbContext(IServiceScope scope)
+    {
         return scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     }
 
-    private void AttemptReconnect()
+    private async Task OnClientDisconnect(MoonrakerClient moonrakerClient)
     {
-        while (true)
+        int clientId;
+        lock (_moonrakerClients)
         {
-            // TODO: Repeatedly attempt to reconnect if not connected
+            clientId = _moonrakerClients.First(client => client.Value == moonrakerClient).Key;
         }
-        // ReSharper disable once FunctionNeverReturns
+        
+        using var scope = GetServiceScope();
+        await using var db = GetDbContext(scope);
+        
+        var connectionInfo = db.MoonrakerInstances.FirstOrDefault(instance => instance.Id == clientId);
+        if(connectionInfo == null)
+            return;
+        
+        string clientName = connectionInfo.Name;
+        
+        OnMoonrakerClientDisconnected?.Invoke(clientName, moonrakerClient);
+
+        if (connectionInfo.ShouldReconnect)
+        {
+            while (!moonrakerClient.IsConnected)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(_reconnectAttemptRateSeconds));
+            
+                await moonrakerClient.Connect();
+                OnMoonrakerClientConnected?.Invoke(clientName, moonrakerClient);
+            }
+        }
     }
+    
     
 }

@@ -1,4 +1,5 @@
 ﻿@page "/MoonrakerAPITest"
+@using Farmetta.Components.Widgets
 @rendermode InteractiveServer
 
 <h3>MoonrakerAPITest</h3>
@@ -28,15 +29,4 @@
     <button @onclick="AddMoonrakerInstance">Add Instance</button>
 </div>
 
-<h3>Moonraker Instances:</h3>
-<table>
-    <tr>
-        <td>Instance Name</td>
-    </tr>
-    @foreach (var moonInstanceName in MoonrakerInstanceManager.GetAllMoonrakerInstanceNames())
-    {
-        <tr>
-            <td>@moonInstanceName</td>
-        </tr>
-    }
-</table>
+<MoonrakerClientsList />

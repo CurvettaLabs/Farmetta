@@ -1,0 +1,18 @@
+﻿.is-connected-bubble{
+    border-radius: 1em;
+    padding: 0.5em;
+    color: white;
+    text-align: center;
+}
+
+.disconnected-bubble{
+    background-color: red;
+}
+
+.connected-bubble{
+    background-color: green;
+}
+
+.moonraker-clients-list-table {
+    border: black solid 1px;
+}

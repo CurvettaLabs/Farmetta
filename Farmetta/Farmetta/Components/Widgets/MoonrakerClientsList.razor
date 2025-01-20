@@ -1,0 +1,27 @@
+﻿@rendermode InteractiveServer
+
+
+<h3>MoonrakerClientsList</h3>
+
+<table class="moonraker-clients-list-table">
+    <tr>
+        <td>Client Name</td>
+        <td>Client IP</td>
+        <td>Client Port</td>
+        <td>Auto Connect</td>
+        <td>Connected</td>
+    </tr>
+    @foreach (var clientName in _moonrakerInstanceManager.GetAllMoonrakerInstanceNames())
+    {
+        var client = _moonrakerInstanceManager[clientName];
+        <tr>
+            <td>@clientName</td>
+            <td>@client.Hostname</td>
+            <td>@client.Port</td>
+            <td></td>
+            <td><div class="is-connected-bubble @(client.IsConnected? "connected-bubble": "disconnected-bubble")">@client.IsConnected</div></td>
+            <td><button @onclick="() => RemoveMoonrakerClient(clientName)">Remove</button></td>
+        </tr>
+    }
+    
+</table>
