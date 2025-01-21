@@ -2,10 +2,10 @@
 
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using KlipperInstaller;
 using MoonrakerAPI.API;
 using MoonrakerAPI.WebsocketNotifications;
 
-string json = "{\n    \"jsonrpc\": \"2.0\",\n    \"method\": \"notify_gcode_response\",\n    \"params\": [\"response message\"]\n}";
-var test = JsonSerializer.Deserialize<JsonRpc>(json);
+KlipperInstanceFactory factory = new KlipperInstanceFactory();
 
-GcodeResponse statsUpdate = new(test ?? throw new InvalidOperationException());
+factory.UpdateDeps();

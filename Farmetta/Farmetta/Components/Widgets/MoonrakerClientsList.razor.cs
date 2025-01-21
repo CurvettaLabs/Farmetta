@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using KlipperInstaller;
+using Microsoft.AspNetCore.Components;
 using MoonrakerAPI;
 
 namespace Farmetta.Components.Widgets;
@@ -7,6 +8,9 @@ public partial class MoonrakerClientsList : ComponentBase, IDisposable
 {
     [Inject]
     private MoonrakerInstanceManager _moonrakerInstanceManager { get; set; } = null!;
+
+    [Inject]
+    private KlipperInstanceFactory KlipperInstanceFactory { get; set; } = null!;
 
     protected override void OnInitialized()
     {
@@ -42,6 +46,11 @@ public partial class MoonrakerClientsList : ComponentBase, IDisposable
     private async Task RemoveMoonrakerClient(string clientname)
     {
         await _moonrakerInstanceManager.RemoveClient(clientname);
+    }
+
+    private Task TestKlipperInit()
+    {
+        return KlipperInstanceFactory.UpdateDeps();
     }
 
     public void Dispose()

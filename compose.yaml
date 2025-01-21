@@ -11,6 +11,7 @@
       - "57000:57000"
       - "57200:57200"
       - "57400:57400"
+    user: "0"
 
   virtual-printer:
     image: virtual-klipper-printer-printer

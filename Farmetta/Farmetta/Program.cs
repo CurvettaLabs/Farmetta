@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Farmetta.Components;
 using Farmetta.Components.Account;
 using Farmetta.Data;
+using KlipperInstaller;
 using NotificationManager;
 using NotificationManager.Data;
 
@@ -45,6 +46,12 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 builder.Services.AddSingleton<MoonrakerInstanceManager>();
+
+// Force startup of KlipperInstanceFactory as it takes a significant amount of time to download deps on first open
+KlipperInstanceFactory klipperInstanceFactory = new KlipperInstanceFactory();
+builder.Services.AddSingleton(klipperInstanceFactory);
+
+
 builder.Services.AddScoped<NotificationSender>();
 
 

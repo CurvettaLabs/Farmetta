@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\KlipperInstaller\KlipperInstaller.csproj" />
         <ProjectReference Include="..\..\MoonrakerAPI\MoonrakerAPI.csproj" />
         <ProjectReference Include="..\..\NotificationManager\NotificationManager.csproj" />
         <ProjectReference Include="..\Farmetta.Client\Farmetta.Client.csproj"/>
