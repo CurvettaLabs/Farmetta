@@ -31,7 +31,7 @@ public class KlipperDepsParser
 
             foreach (var dep in deps)
             {
-                if(dep != "${PKGLIST}" && dep != string.Empty)
+                if(dep != "${PKGLIST}" && dep != "virtualenv" && dep != "python-dev" && dep != string.Empty)
                     yield return dep;
             }
         }

@@ -38,15 +38,15 @@ public static class CmdHelper
                     {
                         // Write each command to the shell
                         Console.WriteLine($"Running: {command}");
-                        stdin.WriteLine(command);
+                        await stdin.WriteLineAsync(command);
                     }
 
                     // Signal the end of commands
                     stdin.Close();
 
                     // Read and display the output
-                    string output = stdout.ReadToEnd();
-                    string error = stderr.ReadToEnd();
+                    string output = await stdout.ReadToEndAsync();
+                    string error = await stderr.ReadToEndAsync();
 
                     Console.WriteLine("Output:");
                     Console.WriteLine(output);

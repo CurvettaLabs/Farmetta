@@ -48,9 +48,11 @@ public partial class MoonrakerClientsList : ComponentBase, IDisposable
         await _moonrakerInstanceManager.RemoveClient(clientname);
     }
 
-    private Task TestKlipperInit()
+    private async Task TestKlipperInit()
     {
-        return KlipperInstanceFactory.UpdateDeps();
+        //await KlipperInstanceFactory.UpdateDeps();
+        //await KlipperInstanceFactory.CreateVirtualEnv(0);
+        await KlipperInstanceFactory.CreateKlipperService(0);
     }
 
     public void Dispose()
