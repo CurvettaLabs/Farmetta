@@ -18,7 +18,6 @@ public static class CmdHelper
                 RedirectStandardError = true,  // To capture errors
                 UseShellExecute = false,       // Required for redirection
                 CreateNoWindow = true,          // Do not create a terminal window
-                UserName = "root"
             }
         };
 

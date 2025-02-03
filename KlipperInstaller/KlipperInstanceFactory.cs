@@ -27,7 +27,6 @@ public class KlipperInstanceFactory : IDisposable
             CloneRepo().Wait();
         
         repo = new Repository(KlipperRepoPath);
-        
     }
 
     public void Dispose()
@@ -49,8 +48,6 @@ public class KlipperInstanceFactory : IDisposable
     {
         if (version != null)
             await GotoVersion(version);
-        
-        
     }
 
     private async Task GotoVersion(string version)
@@ -65,9 +62,15 @@ public class KlipperInstanceFactory : IDisposable
     private async Task CloneRepo()
     {
         Console.WriteLine("Cloning repo...");
-        KlipperRepoPath = await Task.Run(() => Repository.Clone(KlipperRepoUrl, KlipperRepoPath )) ;
-
+        KlipperRepoPath = await Task.Run(() => Repository.Clone(KlipperRepoUrl, KlipperRepoPath ));
+        Console.WriteLine(KlipperRepoPath);
+        KlipperRepoPath = Directory.GetParent(KlipperRepoPath)?.Parent?.FullName ?? throw new InvalidOperationException("Unable to get klipper repo path");
+        Console.WriteLine(KlipperRepoPath);
+        Console.WriteLine("Cloning repo finished");
+        
+        Console.WriteLine("Updating Deps");
         await UpdateDeps();
+        Console.WriteLine("Finished Updating Deps");
     }
 
     public async Task UpdateDeps()
@@ -77,11 +80,10 @@ public class KlipperInstanceFactory : IDisposable
         var listDeps = depsParser.ListDeps();
         
         
-        // TODO: These commands may need sudo
         // However I think they don't as they're being started from an elevated process
         string[] depsInstallCmds = [
-            "apt-get update", 
-            $"apt-get install --yes {String.Join(' ', listDeps)} python3 python3-venv"
+            "sudo apt-get update", 
+            $"sudo apt-get install --yes {String.Join(' ', listDeps)} python3 python3-venv"
         ];
         
         await CmdHelper.RunCmd(depsInstallCmds);
