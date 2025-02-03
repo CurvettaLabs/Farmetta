@@ -1,0 +1,17 @@
+@rendermode InteractiveAuto
+
+@if (IsOpen)
+{
+    <div class="modal-backdrop">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>@Title</h3>
+                <button @onclick="Close">Close</button>
+            </div>
+            <div class="modal-content">
+                @ChildContent
+            </div>
+        </div>
+    </div>
+}
+

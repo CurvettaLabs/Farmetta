@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using NotificationManager
+@using Farmetta.Client.Components
 @inject NotificationSender NotificationSender
 @inject IJSRuntime JS
 
@@ -13,10 +14,19 @@ Welcome to your new app.
 
 <button @onclick="RequestNotificationPermission">Request Notification Permission</button>
 <button @onclick="TestPushNotification">Push</button><br/>
+
+<a href="/MoonrakerAPITest">MoonrakerAPITest</a>
+<button @onclick="() => testModal.Open()">Open Modal</button>
+
+<Modal Title="Test Modal" @ref="testModal">
+    <h2>Test Content</h2><br />
+    <h3>More Content</h3>
+</Modal>
 @message
 
 @code
 {
+    Modal testModal;
     string message = "";
     async Task RequestNotificationPermission()
     {
